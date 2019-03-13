@@ -1,4 +1,5 @@
 const db =  require('./db.js');
+const checkMillionDollarIdea = require('./checkMillionDollarIdea.js');
 
 const express = require('express');
 const apiRouter = express.Router();
@@ -108,7 +109,7 @@ apiRouter.put('/ideas/:ideaId', checkElement, updateDatabase, (req, res, next) =
   res.send(req.updatedElement);
 });
 
-apiRouter.post('/ideas', addElement, (req, res, next) => {
+apiRouter.post('/ideas', checkMillionDollarIdea, addElement, (req, res, next) => {
   res.send(req.addedElement);
 });
 
@@ -122,7 +123,6 @@ POST /api/meetings to create a new meeting and save it to the database.
 DELETE /api/meetings to delete all meetings from the database.
 */
 apiRouter.use('/meetings', (req, res, next) => {
-  //console.log(req.body);
   req.dbArray = 'meetings';
   next();
 });
