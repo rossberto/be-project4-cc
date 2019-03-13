@@ -4,13 +4,16 @@ const express = require('express');
 const apiRouter = express.Router();
 
 /* Auxiliar functions */
-const checkMinion = (req, res, next) => {
-  const minionId = Number(req.params.minionId);
-  const minion = db.getFromDatabaseById('minions', req.params.minionId);
+const checkElement = (req, res, next) => {
+  let element;
+  if (req.params.minionId) {
+    element = db.getFromDatabaseById(req.dbArray, req.params.minionId);
+  } else if (req.params.ideaId) {
+    element = db.getFromDatabaseById(req.dbArray, req.params.ideaId);
+  }
 
-  if (minion) {
-    req.minion = minion;
-    req.minionId = minionId;
+  if (element) {
+    req.element = element;
     next();
   } else {
     res.status(404).send();
@@ -24,7 +27,7 @@ const updateDatabase = (req, res, next) => {
 }
 /* End of auxiliar functions */
 
-/*
+/* /api/minions
 POST /api/minions to create a new minion and save it to the database.
 GET /api/minions/:minionId to get a single minion by id.
 PUT /api/minions/:minionId to update a single minion by id.
@@ -42,11 +45,11 @@ apiRouter.param('minionId', (req, res, next, id) => {
   next();
 });
 
-apiRouter.get('/minions/:minionId', checkMinion, (req, res, next) => {
-  res.send(req.minion);
+apiRouter.get('/minions/:minionId', checkElement, (req, res, next) => {
+  res.send(req.element);
 });
 
-apiRouter.put('/minions/:minionId', checkMinion, updateDatabase, (req, res, next) => {
+apiRouter.put('/minions/:minionId', checkElement, updateDatabase, (req, res, next) => {
   res.send(req.updatedElement);
 });
 
@@ -57,8 +60,50 @@ apiRouter.post('/minions', (req, res, next) => {
   }
 });
 
-apiRouter.delete('/minions/:minionId', checkMinion, (req, res, next) => {
-  if ( db.deleteFromDatabasebyId('minions', req.minion.id) ) {
+apiRouter.delete('/minions/:minionId', checkElement, (req, res, next) => {
+  if ( db.deleteFromDatabasebyId(req.dbArray, req.element.id) ) {
+    res.status(204).send();
+  } else {
+    res.status(400).send();
+  }
+});
+
+/* /api/ideas
+GET /api/ideas to get an array of all ideas.
+POST /api/ideas to create a new idea and save it to the database.
+GET /api/ideas/:ideaId to get a single idea by id.
+PUT /api/ideas/:ideaId to update a single idea by id.
+DELETE /api/ideas/:ideaId to delete a single idea by id.
+*/
+
+apiRouter.get('/ideas', (req, res, next) => {
+  const minions = db.getAllFromDatabase('ideas');
+  res.send(minions);
+});
+
+
+apiRouter.param('ideaId', (req, res, next, id) => {
+  req.dbArray = 'ideas';
+  next();
+});
+
+apiRouter.get('/ideas/:ideaId', checkElement, (req, res, next) => {
+  res.send(req.element);
+});
+
+apiRouter.put('/ideas/:ideaId', checkElement, updateDatabase, (req, res, next) => {
+  res.send(req.updatedElement);
+});
+
+apiRouter.post('/ideas', (req, res, next) => {
+  if (req.body) {
+    const newIdea = db.addToDatabase('ideas', req.body);
+    res.status(201).send(newIdea);
+  }
+});
+
+apiRouter.delete('/ideas/:ideaId', checkElement, (req, res, next) => {
+  if ( db.deleteFromDatabasebyId(req.dbArray, req.element.id) ) {
     res.status(204).send();
   } else {
     res.status(400).send();
