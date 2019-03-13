@@ -25,6 +25,15 @@ const updateDatabase = (req, res, next) => {
   req.updatedElement = updatedElement;
   next();
 }
+
+const deleteElement = (req, res, next) => {
+  if ( db.deleteFromDatabasebyId(req.dbArray, req.element.id) ) {
+    res.status(204);
+  } else {
+    res.status(400);
+  }
+  next();
+}
 /* End of auxiliar functions */
 
 /* /api/minions
@@ -60,12 +69,8 @@ apiRouter.post('/minions', (req, res, next) => {
   }
 });
 
-apiRouter.delete('/minions/:minionId', checkElement, (req, res, next) => {
-  if ( db.deleteFromDatabasebyId(req.dbArray, req.element.id) ) {
-    res.status(204).send();
-  } else {
-    res.status(400).send();
-  }
+apiRouter.delete('/minions/:minionId', checkElement, deleteElement, (req, res, next) => {
+  res.send();
 });
 
 /* /api/ideas
@@ -102,12 +107,8 @@ apiRouter.post('/ideas', (req, res, next) => {
   }
 });
 
-apiRouter.delete('/ideas/:ideaId', checkElement, (req, res, next) => {
-  if ( db.deleteFromDatabasebyId(req.dbArray, req.element.id) ) {
-    res.status(204).send();
-  } else {
-    res.status(400).send();
-  }
+apiRouter.delete('/ideas/:ideaId', checkElement, deleteElement, (req, res, next) => {
+  res.send();
 });
 
 
