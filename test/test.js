@@ -686,7 +686,7 @@ describe('/api/meetings routes', function() {
 
 });
 
-xdescribe('BONUS: /api/minions/:minionId/work routes', function() {
+describe('BONUS: /api/minions/:minionId/work routes', function() {
 
   let fakeDb = require('../server/db.js').db;
 
@@ -726,7 +726,7 @@ xdescribe('BONUS: /api/minions/:minionId/work routes', function() {
 
     });
 
-    xdescribe('PUT /api/minions/:minionId/work/:workId', function() {
+    describe('PUT /api/minions/:minionId/work/:workId', function() {
 
       it('updates the correct work and returns it', function() {
         let initialWork;
@@ -870,7 +870,7 @@ xdescribe('BONUS: /api/minions/:minionId/work routes', function() {
 
     });
 
-    xdescribe('DELETE /api/minions/:minionId/work/:workId', function() {
+    describe('DELETE /api/minions/:minionId/work/:workId', function() {
 
       it('deletes the correct work by id', function() {
         let initialWorkArray;

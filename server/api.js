@@ -11,6 +11,7 @@ const getArray = (req, res, next) => {
   req.array = array;
   next();
 }
+
 const checkElement = (req, res, next) => {
   let element;
 
@@ -52,6 +53,18 @@ const addElement = (req, res, next) => {
 
   next();
 }
+
+
+const checkWork = (req, res, next) => {
+  const reqWork = req.body;
+  const currentWork = req.minionWork.find( element => element.id === req.params.workId);
+
+  if (!currentWork) {
+    res.status(400).send();
+  } else {
+    next();
+  }
+}
 /* End of auxiliar functions */
 
 /* /api/minions
@@ -83,6 +96,48 @@ apiRouter.post('/minions', addElement, (req, res, next) => {
 
 apiRouter.delete('/minions/:minionId', checkElement, deleteElement, (req, res, next) => {
   res.send();
+});
+
+/* Bonus
+GET /api/minions/:minionId/work to get an array of all work for the specified minon.
+POST /api/minions/:minionId/work to create a new work object and save it to the database.
+PUT /api/minions/:minionId/work/:workId to update a single work by id.
+DELETE /api/minions/:minionId/work/:workId to delete a single work by id.
+*/
+apiRouter.param('minionId', (req, res, next, id) => {
+  const array = db.getAllFromDatabase('work');
+  const minionWork = array.filter( element => element.minionId === id);
+  if (minionWork) {
+    req.minionWork = minionWork;
+    next();
+  } else {
+    res.status(404).send();
+  }
+});
+
+apiRouter.get('/minions/:minionId/work', checkElement, (req, res, next) => {
+  res.send(req.minionWork);
+});
+
+apiRouter.post('/minions/:minionId/work', checkElement, (req, res, next) => {
+  if (req.body) {
+    console.log(req.body);
+    const newWork = db.addToDatabase = ('work', req.body);
+    console.log(newWork);
+    res.status(201).send(newWork);
+  } else {
+    res.status(400).send();
+  }
+});
+
+apiRouter.put('/minions/:minionId/work/:workId', checkElement, checkWork, (req, res, next) => {
+  req.updatedWork = db.updateInstanceInDatabase('work', req.body);
+  res.send(req.updatedWork);
+});
+
+apiRouter.delete('/minions/:minionId/work/:workId', checkElement, checkWork, (req, res, next) => {
+  db.deleteFromDatabasebyId('work', req.params.workId);
+  res.status(204).send();
 });
 
 /* /api/ideas
